@@ -130,3 +130,5 @@ dmypy.json
 
 #Python files
 .idea/
+
+migrations/
