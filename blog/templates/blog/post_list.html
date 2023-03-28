@@ -85,11 +85,13 @@
 
                 {% for p in post_list %}
                 <!-- Blog Post -->
-                <div class="card mb-4">
-                    <img class="card-img-top" src="{{ p.head_image.url }}" alt="Card image cap">
+                    <div class="card mb-4">
+                        {% if p.head_image %}
+                            <img class="card-img-top" src="{{ p.head_image.url }}" alt="Card image cap">
+                        {% endif %}
                     <div class="card-body">
                         <h2 class="card-title">{{ p.title}}</h2>
-                        <p class="card-text">{{ p.content }}</p>
+                        <p class="card-text">{{ p.content | truncatewords:45 }}</p>
                         <a href="{{ p.get_absolute_url }}" class="btn btn-primary">Read More &rarr;</a>
                     </div>
                     <div class="card-footer text-muted">

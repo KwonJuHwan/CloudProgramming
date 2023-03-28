@@ -133,4 +133,5 @@ dmypy.json
 
 migrations/
 
-_media
+#git에선 안보이지만, 가져오긴 함
+_media/
