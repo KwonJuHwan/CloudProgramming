@@ -1,5 +1,4 @@
 import os.path
-
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -9,8 +8,13 @@ class Category(models.Model):
     # URL 에 키워드 넣기 위해서 uuid 같은 숫자가 아닌, 텍스트로 노출 가능
     slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
 
-    def __str__(self):
+    def __str__(self): # 테스트 하기 용이
         return self.name
+
+    # 이름 바꿔 주기
+    class Meta:
+        verbose_name_plural = 'Categories'
+
 
 class Post(models.Model):
     title = models.CharField(max_length=30)
@@ -25,9 +29,10 @@ class Post(models.Model):
 
     # 같이 삭제
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return f'[{self.pk}]{self.title} :: {self.author}' # 작성자 표시
+        return f'[{self.pk}]{self.title} :: {self.author}'  # 작성자 표시
 
     def get_absolute_url(self):
         return f'/blog/{self.pk}'
