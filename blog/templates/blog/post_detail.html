@@ -19,6 +19,7 @@
 
 </head>
 
+
 <body>
 
   <!-- Navigation -->
@@ -65,7 +66,12 @@
           by
           <a href="#">{{ post.author}}</a>
         </p>
-
+        {% if user.is_authenticated %}
+            {% if user == post.author%}
+                <a class="bth btn-info btn-sm float-right" href="/blog/update_post/{{ post.pk }}" role="button"> 글 수정하기
+                </a>
+            {% endif %}
+        {% endif %}
         <hr>
 
         <!-- Date/Time -->
@@ -96,6 +102,7 @@
             <br/>
             <br/>
         {% endif %}
+
 
         <!-- Comments Form -->
         <div class="card my-4">
