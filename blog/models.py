@@ -40,11 +40,12 @@ class Post(models.Model):
     head_image = models.ImageField(upload_to='blog/images/%Y/%m/%d/', blank=True)
     file_upload = models.FileField(upload_to='blog/files/%Y/%m/%d/', blank=True)
 
+    # 자동 생성
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     # 관계 형성
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User,null=False, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
     tag = models.ManyToManyField(Tag, blank=True)
 

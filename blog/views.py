@@ -1,9 +1,22 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
 from .models import Post, Category, Tag
 
 
-# Create your views here.
+class PostCreate(LoginRequiredMixin, CreateView):
+    model = Post
+    fields = ['title', 'content', 'head_image',
+              'file_upload', 'category', 'tag']
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        # getContext 에 PostList 를 담아서 넘겨 줌
+        context = super(PostCreate, self).get_context_data()
+        context['categories'] = Category.objects.all()
+        # 미분류 개수를 받기 위해서
+        context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        return context
+
 
 # 목록 보기 화면
 class PostList(ListView):
@@ -11,6 +24,8 @@ class PostList(ListView):
     # pk의 역 순으로 나오게(최신 글이 위로 나오게)
     ordering = '-pk'
 
+    # CBC 특징 get_context_data 오버라이딩한 후 ,
+    # context에 원하는 데이터 보내주기
     def get_context_data(self, *, object_list=None, **kwargs):
         # getContext 에 PostList 를 담아서 넘겨 줌
         context = super(PostList, self).get_context_data()
