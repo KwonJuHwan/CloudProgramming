@@ -1,5 +1,12 @@
 {% extends 'blog/base.html' %}
 {% block main_area %}
+    {% if user.is_authenticated %}
+        {% if user.is_superuser or user.is_staff %}
+            <a class="bth btn-info btn-sm float-right" href="/blog/created_post" role="button"> 글쓰기
+            </a>
+        {% endif %}
+    {% endif %}
+
     <h1>Blog </h1>
     <h2>{% if  category %} postings with category {{ category }}
     {% endif %}

@@ -1,13 +1,40 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import render, redirect
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import Post, Category, Tag
 
 
-class PostCreate(LoginRequiredMixin, CreateView):
+class PostUpdate(LoginRequiredMixin, UpdateView):
     model = Post
     fields = ['title', 'content', 'head_image',
               'file_upload', 'category', 'tag']
+    # like FBV, template 강제 할당
+    template_name = "blog/post_update.html"
+    # 권한 확인
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and self.get_object().author == request.user :
+            return super(PostUpdate,self).dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionError
+# LoginRequiredMixin 로그 아웃 상태 -> accounts/login url 로 이동 시킴
+class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Post
+    fields = ['title', 'content', 'head_image',
+              'file_upload', 'category', 'tag']
+
+    # 권한 체크
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.is_superuser
+
+    # form 정보를 user 가 보냈을 떄(request.user 로 받을 수 있음), 검증 실행
+    def form_valid(self, form):
+        # 로그인이 되어있다면
+        if self.request.user.is_authenticated \
+                and (self.request.user.is_staff or self.request.user.is_superuser):
+            form.instance.author = self.request.user
+            return super(PostCreate, self).form_valid(form)
+        else:
+            return redirect('/blog/')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         # getContext 에 PostList 를 담아서 넘겨 줌
