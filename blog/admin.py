@@ -1,7 +1,9 @@
 from django.contrib import admin
+from markdownx.admin import MarkdownxModelAdmin
+
 from .models import Post, Category, Tag
 
-admin.site.register(Post)
+admin.site.register(Post, MarkdownxModelAdmin)
 
 
 # name field 로 slug 를 자동 생성

@@ -22,6 +22,8 @@ from django_project import settings
 urlpatterns = [
     path('blog/', include('blog.urls')),
     path('admin/', admin.site.urls),
+    # http 태그로 변환하기 위한 URL 패턴
+    path('markdownx/', include('markdownx.urls')),
     path('', include('single_pages.urls')),
 ]
 #다음에 바뀌어도 오류가 나지않게 하기위해 settings 사용

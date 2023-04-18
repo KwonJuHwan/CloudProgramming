@@ -87,7 +87,8 @@
         <hr>
 
         <!-- Post Content -->
-        <p>{{ post.content }}</p>
+{#        이스케이핑 : html 태그를 인식해주세요 -> safe 태그 #}
+        <p>{{ post.get_content_markdown | safe}}</p>
         {% if post.file_upload %}
             <a href="{{ post.file_upload.url }}"> <button type="button" class="btn btn-outline-primary">첨부파일 업로드</button></a>
             {{ post.get_file_name }}

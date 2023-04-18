@@ -1,6 +1,8 @@
 import os.path
 from django.contrib.auth.models import User
 from django.db import models
+from markdown import markdown
+from markdownx.models import MarkdownxField
 
 
 # 카테고리 만드는 것과 유사
@@ -34,7 +36,8 @@ class Category(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=30)
-    content = models.TextField()
+    # models.Textfield() -> MarkdownxField()
+    content = MarkdownxField()
 
     # 중복을 피하기 위해 사용 -> upload_to
     head_image = models.ImageField(upload_to='blog/images/%Y/%m/%d/', blank=True)
@@ -45,7 +48,7 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # 관계 형성
-    author = models.ForeignKey(User,null=False, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
     tag = models.ManyToManyField(Tag, blank=True)
 
@@ -57,3 +60,8 @@ class Post(models.Model):
 
     def get_file_name(self):
         return os.path.basename(self.file_upload.name)
+
+    # 템플릿에선 param을 넘길 수 없으므로, param 없이 작동하도록 메소드를 구현해야함
+    def get_content_markdown(self):
+        # content 부분만 markdown 으로 변환
+        return markdown(self.content)

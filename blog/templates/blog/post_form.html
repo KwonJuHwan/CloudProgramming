@@ -1,13 +1,21 @@
-{% extends 'blog/base.html'%}
+{% extends 'blog/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block main_area %}
     <h1> 블로그 새 글 작성</h1>
     <form method="POST" enctype="multipart/form-data">{% csrf_token %}
-    <table>
-        {{ form }}
-    </table>
-    <button type="submit" class="btn btn-primary float-right">
-        글쓰기
-    </button>
+        <table>
+            {{ form | crispy}}
+        </table>
+        <button type="submit" class="btn btn-primary float-right">
+            글쓰기
+        </button>
     </form>
+
+    {% comment %}글 쓰는 내용을 markdownx 로 렌더링 되기 위해{% endcomment %}
+    <p>Preview</p>
+    {% comment %}markdownx로 렌더링 된 media를 보여주기 위함
+    markdown form 으로 작성 시 , 렌더링 해서 보여줌{% endcomment %}
+    {{ form.media }}
+
 {% endblock %}
