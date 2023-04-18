@@ -1,6 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
+
+from .forms import CommentForm
 from .models import Post, Category, Tag
 
 
@@ -10,12 +12,15 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
               'file_upload', 'category', 'tag']
     # like FBV, template 강제 할당
     template_name = "blog/post_update.html"
+
     # 권한 확인
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and self.get_object().author == request.user :
-            return super(PostUpdate,self).dispatch(request, *args, **kwargs)
+        if request.user.is_authenticated and self.get_object().author == request.user:
+            return super(PostUpdate, self).dispatch(request, *args, **kwargs)
         else:
             raise PermissionError
+
+
 # LoginRequiredMixin 로그 아웃 상태 -> accounts/login url 로 이동 시킴
 class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Post
@@ -71,6 +76,8 @@ class PostDetail(DetailView):
         context['categories'] = Category.objects.all()
         # 미분류 개수를 받기 위해서
         context['no_category_count'] = Post.objects.filter(category=None).count()
+        # 댓글 폼 넘기기
+        context['comment_form'] = CommentForm
         return context
 
 
@@ -92,6 +99,7 @@ def categories_page(request, slug):
         'post_list': post_list,
         'no_category_count': Post.objects.filter(category=None).count()
     }
+
     return render(request, 'blog/post_list.html', context)
 
 
@@ -119,3 +127,23 @@ def single_post_page(request, pk):
             'post': post,
         }
     )
+
+
+def add_comment(request, pk):
+    if request.user.is_authenticated:
+        raise PermissionError
+
+    # pk를 통해, Post 찾기 for Redirect
+    if request.method == 'POST':
+        # 존재 하지 않는 글에 댓글 접근 하는 경우를 만들어줘야함 (동시성)
+        post = Post.objects.get(pk=pk)
+        comment_form = CommentForm(request.POST)
+        # DB 에 넣기 전 필요한 field 를 채우기 위해 temp 생성
+        comment_temp = comment_form.save(commit=False)
+        comment_temp.post = post
+        comment_temp.author = request.user
+        # DB 에 넣기
+        comment_temp.save()
+        return redirect(post.get_absolute_url())
+    else:
+        raise PermissionError
